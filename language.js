@@ -32,35 +32,29 @@ Language.prototype.__handleLanguage = function (value) {
 }
 
 /**
- *
+ * simply select all resolves all simple connection.
  * @param node
  * @returns {{}}
  */
 
 Language.prototype.simple = function (node) {
     var output = {};
-    if (typeof(node) == "string") {
-        var data = this.data[node]
-    }
-    else {
-        var data = node;
-    }
-
+    var data = typeof(node) == "string" ? this.data[node] : node;
     for (key in data) {
         output[key] = this.__handleLanguage(data[key])
     }
     return output;
 }
 
+/**
+ * Browses to all Objects of node, including arrays and selects the approriate language.
+ * @param node
+ * @returns {{}}
+ */
+
 Language.prototype.complex = function (node) {
     var output = {};
-    if (typeof(node) == "string") {
-        var node = this.data[node]
-    }
-    else {
-        var node = node;
-    }
-
+    var node = typeof(node) == "string" ? this.data[node] : node;
     for (key in node) {
         if (toString.call(node[key]) == '[object Array]') {
             output[key] = [];
@@ -77,7 +71,6 @@ Language.prototype.complex = function (node) {
         }
 
     }
-
     return output;
 }
 
