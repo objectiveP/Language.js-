@@ -1,5 +1,5 @@
 /**
- *  leightweight library to extract nested key from javascript Objects.
+ *  leightweight library to extract nested key from javascript Objects, which might be useful for languages.
  *
  *
  * @param data {object}
@@ -8,10 +8,11 @@
  */
 
 
-var Language = function (data, lang, placeholder) {
+var Language = function (data, lang, placeholder, selector) {
     this.data = data;
     this.lang = lang;
-    this.placeholder = placeholder ? placeholder : "%v%"
+    this.placeholder = placeholder ? placeholder : "v"
+    this.selector = selector ? selector : "%"
 };
 
 /**
@@ -39,11 +40,11 @@ Language.prototype.__replaceVariable = function(string ,data){
     }
 
     if (typeof(data) == "string"){
-        output = string.replace(this.placeholder, data);
+        output = string.replace(this.selector+this.placeholder+this.selector, data);
     }
     else if (toString.call(data) == '[object Object]'){
         for (key in data){
-            output = output.replace("%"+key+"%", data[key])
+            output = output.replace(this.selector+key+this.selector, data[key])
         }
     }
     return output
@@ -130,6 +131,8 @@ Language.prototype.simpleWithVars = function(node, values){
             output[key] = this.__replaceVariable(input[key], values)
         }
     }
+
+    return output;
 
 }
 
