@@ -1,5 +1,5 @@
 /**
- *  super leightweigt language selector library.
+ *  leightweight library to extract nested key from javascript Objects.
  *
  *
  * @param data {object}
@@ -8,9 +8,10 @@
  */
 
 
-var Language = function (data, lang) {
+var Language = function (data, lang, placeholder) {
     this.data = data;
     this.lang = lang;
+    this.placeholder = placeholder ? placeholder : "%v%"
 };
 
 /**
@@ -22,19 +23,56 @@ var Language = function (data, lang) {
 
 Language.prototype.__handleLanguage = function (value) {
 
-    if (typeof(value[this.lang]) != "undefined") {
-        return value[this.lang];
+    var output = typeof(value[this.lang]) != "undefined" ?  value[this.lang] :  value
+    return output;
+
+}
+
+
+Language.prototype.__replaceVariable = function(string ,data){
+
+    if (typeof (string) == "string"){
+        var output = string;
     }
     else {
-        return value
+        return string;
     }
+
+    if (typeof(data) == "string"){
+        output = string.replace(this.placeholder, data);
+    }
+    else if (toString.call(data) == '[object Object]'){
+        for (key in data){
+            output = output.replace("%"+key+"%", data[key])
+        }
+    }
+    return output
+}
+
+/**
+ * sets the current language
+ * @param lang {string}
+ */
+
+Language.prototype.setLanguage = function (lang){
+    this.lang = lang
+}
+
+
+/**
+ *  sets the data source
+ * @param data {object}
+ */
+
+Language.prototype.setDataSource = function(data){
+    this.data = data
 
 }
 
 /**
- * simply select all resolves all simple connection.
+ * returns the selected language of a simple node.
  * @param node
- * @returns {{}}
+ * @returns {{Object}}
  */
 
 Language.prototype.simple = function (node) {
@@ -47,7 +85,7 @@ Language.prototype.simple = function (node) {
 }
 
 /**
- * Browses to all Objects of node, including arrays and selects the approriate language.
+ * Browses to all values of node, including arrays and selects the approriate key(language).
  * @param node
  * @returns {{}}
  */
@@ -69,12 +107,31 @@ Language.prototype.complex = function (node) {
         else {
             output[key] = this.__handleLanguage(node[key])
         }
-
     }
     return output;
 }
 
 
+/**
+ * Extracts the keys from a simple node.
+ * @param node {string, object}
+ * @param values {object}
+ */
+
+
+Language.prototype.simpleWithVars = function(node, values){
+
+    var output = {}
+    var input = this.simple(node)
+
+
+    if(toString.call(values) == '[object Object]'){
+        for (key in input){
+            output[key] = this.__replaceVariable(input[key], values)
+        }
+    }
+
+}
 
 
 
